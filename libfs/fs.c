@@ -155,6 +155,14 @@ int fs_info(void)
 {
     /* TODO: Phase 1 */
 
+    //Print info
+    printf("FS info:\n");
+    printf("total_blk_count=%d\n", mounteddisk->superblock->numBlocks);
+    printf("fat_blk_count=%d\n", mounteddisk->superblock->numFATBlocks);
+    printf("rdir_blk=%d\n", mounteddisk->superblock->numFATBlocks + 1);
+    printf("data_blk=%d\n", mounteddisk->superblock->numFATBlocks + 2);
+    printf("data_blk_count=%d\n", mounteddisk->superblock->numDataBlocks);
+
     return SUCCESS;
 }
 
