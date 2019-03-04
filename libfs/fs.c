@@ -56,6 +56,8 @@ typedef struct disk
     
 } disk;
 
+disk mounteddisk;
+
 int fs_mount(const char *diskname)
 {
     /* TODO: Phase 1 */
