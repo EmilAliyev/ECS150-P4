@@ -8,6 +8,8 @@
 #include "fs.h"
 
 /* TODO: Phase 1 */
+#define BLOCK_SIZE 4096
+
 #define SUPERBLOCK_INDEX 0
 #define SUPERBLOCK_UNUSED_BYTES 4079
 
@@ -63,7 +65,15 @@ disk *mounteddisk = NULL;
 //Copy the blocks to the mounted disk
 static void copyBlocks()
 {
+
+    //Copy superblock
     block_read(SUPERBLOCK_INDEX, mounteddisk->superblock);
+
+    //Get the index of the root directory
+    int rootindex = (int) mounteddisk->superblock->numFATBlocks + 1;
+
+    //Copy root directory
+    block_read(rootindex, mounteddisk->root);
 }
 
 //Create a new disk
@@ -76,6 +86,8 @@ static void createNewDisk(const char *diskname)
     mounteddisk->diskname = malloc(namelength * sizeof(char));
 
     mounteddisk->superblock = malloc(sizeof(Superblock));
+
+    mounteddisk->root = malloc(BLOCK_SIZE);
 
     strcpy(mounteddisk->diskname, diskname);
 }
