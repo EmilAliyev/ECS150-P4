@@ -15,6 +15,7 @@
 #define ROOT_ENTRY_UNUSED_BYTES 10
 
 #define SUCCESS 0
+#define FAILURE -1
 
 //Superblock
 typedef struct Superblock
@@ -61,6 +62,12 @@ disk mounteddisk;
 int fs_mount(const char *diskname)
 {
     /* TODO: Phase 1 */
+
+    //Attempt to open disk.
+     
+    if(block_disk_open(diskname) != SUCCESS)
+        return FAILURE;
+    
 
     return SUCCESS;
 }
