@@ -57,12 +57,12 @@ typedef struct disk
     
 } disk;
 
-disk *mounteddisk;
+disk *mounteddisk = NULL;
 
 //Copy the blocks to the mounted disk
 static void copyBlocks()
 {
-    //Copy superblock
+    block_read(0, mounteddisk->superblock);
 }
 
 //Create a new disk
@@ -73,6 +73,8 @@ static void createNewDisk(const char *diskname)
     mounteddisk = malloc(sizeof(disk));
     
     mounteddisk->diskname = malloc(namelength * sizeof(char));
+
+    mounteddisk->superblock = malloc(sizeof(Superblock));
 
     strcpy(mounteddisk->diskname, diskname);
 }
@@ -108,6 +110,11 @@ int fs_mount(const char *diskname)
 int fs_umount(void)
 {
     /* TODO: Phase 1 */
+
+    //Make sure disk is mounted
+    if(mounteddisk == NULL)
+        return FAILURE;
+    
 
     //Free the disk
     freeDisk();
