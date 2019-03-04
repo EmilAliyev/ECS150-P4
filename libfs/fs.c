@@ -45,6 +45,8 @@ typedef struct rootdirecotry
     rootentry entries [ROOT_ENTRIES];
 } rootdirectory;
 
+typedef uint16_t* FAT;
+
 int fs_mount(const char *diskname)
 {
     /* TODO: Phase 1 */
