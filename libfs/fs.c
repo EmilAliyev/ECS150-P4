@@ -85,6 +85,7 @@ static void createNewDisk(const char *diskname)
 static void freeDisk()
 {
     free(mounteddisk->diskname);
+    free(mounteddisk->superblock);
     free(mounteddisk);
 }
 
