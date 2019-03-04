@@ -51,13 +51,19 @@ typedef uint16_t* FAT;
 typedef struct disk
 {
     char *diskname;
-    Superblock superblock;
+    Superblock *superblock;
     FAT fat;
-    Rootdirectory root;
+    Rootdirectory *root;
     
 } disk;
 
 disk *mounteddisk;
+
+//Copy the blocks to the mounted disk
+static void copyBlocks()
+{
+    //Copy superblock
+}
 
 //Create a new disk
 static void createNewDisk(const char *diskname)
@@ -71,6 +77,15 @@ static void createNewDisk(const char *diskname)
     strcpy(mounteddisk->diskname, diskname);
 }
 
+
+//Free mounted disk
+static void freeDisk()
+{
+    free(mounteddisk->diskname);
+    free(mounteddisk);
+}
+
+
 int fs_mount(const char *diskname)
 {
     /* TODO: Phase 1 */
@@ -82,6 +97,9 @@ int fs_mount(const char *diskname)
 
     //Create new disk
     createNewDisk(diskname);
+
+    //Copy the blocks
+    copyBlocks();
     
 
     return SUCCESS;
@@ -90,6 +108,9 @@ int fs_mount(const char *diskname)
 int fs_umount(void)
 {
     /* TODO: Phase 1 */
+
+    //Free the disk
+    freeDisk();
 
     return SUCCESS;
 }
