@@ -31,7 +31,7 @@ typedef struct Superblock
     int8_t numFATBlocks; //Number of blocks for FAT (File Allocation Table)
     int8_t padding [SUPERBLOCK_UNUSED_BYTES]; //Unused/padding
     
-} Superblock;
+} __attribute__((packed)) Superblock;
 
 //One entry in root directory
 typedef struct Rootentry
@@ -41,13 +41,13 @@ typedef struct Rootentry
     int16_t firstdatablockindex; //Index of first data block
     int8_t padding [ROOT_ENTRY_UNUSED_BYTES]; //Unused/padding
     
-} Rootentry;
+} __attribute__((packed)) Rootentry;
 
 //Root directory - contains 128 32-byte entries, 1 entry per file
 typedef struct Rootdirecotry
 {
     Rootentry entries [ROOT_ENTRIES];
-} Rootdirectory;
+} __attribute__((packed)) Rootdirectory;
 
 typedef uint16_t* FAT;
 
@@ -66,6 +66,10 @@ disk *mounteddisk = NULL;
 static void copyFAT()
 {
 
+//not working yet, I'm working on it	
+//    for(int i = 1; i <= mounteddisk->superblock->numFATBlocks; i++){
+//        block_read(1, mounteddisk->fat);
+//    }
 }
 
 //Copy the blocks to the mounted disk
@@ -76,13 +80,13 @@ static void copyBlocks()
     block_read(SUPERBLOCK_INDEX, mounteddisk->superblock);
 
     //Get the index of the root directory
-    int rootindex = (int) mounteddisk->superblock->numFATBlocks + 1;
+    //int rootindex = (int) mounteddisk->superblock->numFATBlocks + 1;
 
     //Copy the FAT
     copyFAT();
 
     //Copy root directory
-    block_read(rootindex, mounteddisk->root);
+    block_read(mounteddisk->superblock->rootindex, mounteddisk->root);
 }
 
 //Create a new disk
@@ -132,7 +136,6 @@ int fs_mount(const char *diskname)
     //Copy the blocks
     copyBlocks();
     
-
     return SUCCESS;
 }
 
@@ -153,8 +156,6 @@ int fs_umount(void)
 
 int fs_info(void)
 {
-    /* TODO: Phase 1 */
-
     //Print info
     printf("FS info:\n");
     printf("total_blk_count=%d\n", mounteddisk->superblock->numBlocks);
@@ -162,7 +163,12 @@ int fs_info(void)
     printf("rdir_blk=%d\n", mounteddisk->superblock->numFATBlocks + 1);
     printf("data_blk=%d\n", mounteddisk->superblock->numFATBlocks + 2);
     printf("data_blk_count=%d\n", mounteddisk->superblock->numDataBlocks);
+    
+    
+    //printf("fat_free_ratio=%d/%d\n", fat_free, BLOCK_SIZE * mounteddisk->superblock->numFATBlocks);
 
+    //printf("rdir_free_ratio=%d/%d\n", mounteddisk->superblock->, mounteddisk->superblock->numDataBlocks);
+    
     return SUCCESS;
 }
 
