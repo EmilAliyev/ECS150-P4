@@ -98,6 +98,7 @@ static void freeDisk()
 {
     free(mounteddisk->diskname);
     free(mounteddisk->superblock);
+    free(mounteddisk->root);
     free(mounteddisk);
 }
 
