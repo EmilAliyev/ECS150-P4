@@ -9,10 +9,15 @@
 
 /* TODO: Phase 1 */
 #define SUPERBLOCK_UNUSED_BYTES 4079
+
+#define ROOT_ENTRIES 128
+#define ROOT_FILENAME_SIZE 16
+#define ROOT_ENTRY_UNUSED_BYTES 10
+
 #define SUCCESS 0
 
 //Superblock
-struct superblock
+typedef struct superblock
 {
     int64_t signature; //Signature (must be equal to "ECS150FS")
     int16_t numBlocks; //Total amount of blocks of virtual disk
@@ -22,7 +27,23 @@ struct superblock
     int8_t numFATBlocks; //Number of blocks for FAT (File Allocation Table)
     int8_t padding [SUPERBLOCK_UNUSED_BYTES]; //Unused/padding
     
-};
+} superblock;
+
+//One entry in root directory
+typedef struct rootentry
+{
+	int8_t filename[ROOT_FILENAME_SIZE]; //Filename (including NULL character)
+	int32_t filesize; //Size of the file (in bytes)
+	int16_t firstdatablockindex; //Index of first data block
+	int8_t padding [ROOT_ENTRY_UNUSED_BYTES]; //Unused/padding
+	
+} rootentry;
+
+//Root directory - contains 128 32-byte entries, 1 entry per file
+typedef struct rootdirecotry
+{
+	rootentry entries [ROOT_ENTRIES];
+} rootdirectory;
 
 int fs_mount(const char *diskname)
 {
