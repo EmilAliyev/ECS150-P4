@@ -62,6 +62,12 @@ typedef struct disk
 
 disk *mounteddisk = NULL;
 
+//Copy the FAT of the mounted disk
+static void copyFAT()
+{
+
+}
+
 //Copy the blocks to the mounted disk
 static void copyBlocks()
 {
@@ -71,6 +77,9 @@ static void copyBlocks()
 
     //Get the index of the root directory
     int rootindex = (int) mounteddisk->superblock->numFATBlocks + 1;
+
+    //Copy the FAT
+    copyFAT();
 
     //Copy root directory
     block_read(rootindex, mounteddisk->root);
@@ -85,7 +94,11 @@ static void createNewDisk(const char *diskname)
     
     mounteddisk->diskname = malloc(namelength * sizeof(char));
 
+    //Allocate blocks
     mounteddisk->superblock = malloc(sizeof(Superblock));
+
+    //Number of entries in FAT is 2048 per block as each entry is 16 bits
+    mounteddisk->fat = malloc(BLOCK_SIZE/2 * mounteddisk->superblock->numFATBlocks * sizeof(uint16_t));
 
     mounteddisk->root = malloc(BLOCK_SIZE);
 
@@ -98,6 +111,7 @@ static void freeDisk()
 {
     free(mounteddisk->diskname);
     free(mounteddisk->superblock);
+    free(mounteddisk->fat);
     free(mounteddisk->root);
     free(mounteddisk);
 }
