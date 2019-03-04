@@ -57,7 +57,19 @@ typedef struct disk
     
 } disk;
 
-disk mounteddisk;
+disk *mounteddisk;
+
+//Create a new disk
+static void createNewDisk(const char *diskname)
+{
+    int namelength = strlen(diskname);
+
+    mounteddisk = malloc(sizeof(disk));
+    
+    mounteddisk->diskname = malloc(namelength * sizeof(char));
+
+    strcpy(mounteddisk->diskname, diskname);
+}
 
 int fs_mount(const char *diskname)
 {
@@ -67,6 +79,9 @@ int fs_mount(const char *diskname)
      
     if(block_disk_open(diskname) != SUCCESS)
         return FAILURE;
+
+    //Create new disk
+    createNewDisk(diskname);
     
 
     return SUCCESS;
