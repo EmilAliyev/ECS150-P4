@@ -32,95 +32,95 @@ typedef struct superblock
 //One entry in root directory
 typedef struct rootentry
 {
-	int8_t filename[ROOT_FILENAME_SIZE]; //Filename (including NULL character)
-	int32_t filesize; //Size of the file (in bytes)
-	int16_t firstdatablockindex; //Index of first data block
-	int8_t padding [ROOT_ENTRY_UNUSED_BYTES]; //Unused/padding
-	
+    int8_t filename[ROOT_FILENAME_SIZE]; //Filename (including NULL character)
+    int32_t filesize; //Size of the file (in bytes)
+    int16_t firstdatablockindex; //Index of first data block
+    int8_t padding [ROOT_ENTRY_UNUSED_BYTES]; //Unused/padding
+    
 } rootentry;
 
 //Root directory - contains 128 32-byte entries, 1 entry per file
 typedef struct rootdirecotry
 {
-	rootentry entries [ROOT_ENTRIES];
+    rootentry entries [ROOT_ENTRIES];
 } rootdirectory;
 
 int fs_mount(const char *diskname)
 {
-	/* TODO: Phase 1 */
+    /* TODO: Phase 1 */
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
 int fs_umount(void)
 {
-	/* TODO: Phase 1 */
+    /* TODO: Phase 1 */
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
 int fs_info(void)
 {
-	/* TODO: Phase 1 */
+    /* TODO: Phase 1 */
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
 int fs_create(const char *filename)
 {
-	/* TODO: Phase 2 */
+    /* TODO: Phase 2 */
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
 int fs_delete(const char *filename)
 {
-	/* TODO: Phase 2 */
+    /* TODO: Phase 2 */
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
 int fs_ls(void)
 {
-	/* TODO: Phase 2 */
+    /* TODO: Phase 2 */
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
 int fs_open(const char *filename)
 {
-	/* TODO: Phase 3 */
+    /* TODO: Phase 3 */
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
 int fs_close(int fd)
 {
-	/* TODO: Phase 3 */
-	return SUCCESS;
+    /* TODO: Phase 3 */
+    return SUCCESS;
 }
 
 int fs_stat(int fd)
 {
-	/* TODO: Phase 3 */
-	return SUCCESS;
+    /* TODO: Phase 3 */
+    return SUCCESS;
 }
 
 int fs_lseek(int fd, size_t offset)
 {
-	/* TODO: Phase 3 */
-	return SUCCESS;
+    /* TODO: Phase 3 */
+    return SUCCESS;
 }
 
 int fs_write(int fd, void *buf, size_t count)
 {
-	/* TODO: Phase 4 */
-	return SUCCESS;
+    /* TODO: Phase 4 */
+    return SUCCESS;
 }
 
 int fs_read(int fd, void *buf, size_t count)
 {
-	/* TODO: Phase 4 */
-	return SUCCESS;
+    /* TODO: Phase 4 */
+    return SUCCESS;
 }
 
