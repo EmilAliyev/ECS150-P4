@@ -125,7 +125,7 @@ static Rootentry* findNextEmpty()
 {
     for(int i = 0; i < ROOT_ENTRIES; i++)
     {
-        if(rootEntryFree(mounteddisk->root->entries[i]) != SUCCESS){
+        if(rootEntryFree(mounteddisk->root->entries[i]) == SUCCESS){
 	    return &mounteddisk->root->entries[i];
 	}
     }
@@ -461,6 +461,8 @@ int fs_delete(const char *filename)
 int fs_ls(void)
 {
     /* TODO: Phase 2 */
+
+    printf("FS Ls:\n");
 
     return SUCCESS;
 }
