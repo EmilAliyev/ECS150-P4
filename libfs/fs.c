@@ -76,7 +76,18 @@ static void copyFAT()
 //Get the number of free data blocks from the fat
 static int numFreeDataBlocks()
 {
-    return 0;
+    int numFatEntries = BLOCK_SIZE/2 * mounteddisk->superblock->numFATBlocks;
+    int numFreeBlocks = 0;
+
+    //A FAT entry of 0 corresponds to a free data block
+    for(int i = 0; i < numFatEntries; i++)
+    {
+        if(mounteddisk->fat[i] == 0)
+            numFreeBlocks++;
+    }
+    
+
+    return numFreeBlocks;
 }
 
 //Get the number of empty entries in root directory
