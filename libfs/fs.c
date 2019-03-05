@@ -120,6 +120,33 @@ static int numFilesRootDir()
     return numfiles;
 }
 
+//return a pointer to the first availible empty root entry
+static Rootentry* findNextEmpty()
+{
+    for(int i = 0; i < ROOT_ENTRIES; i++)
+    {
+        if(rootEntryFree(mounteddisk->root->entries[i]) != SUCCESS){
+	    return &mounteddisk->root->entries[i];
+	}
+    }
+
+    return NULL;
+}
+
+//Search for file in root directory
+static Rootentry* findFile(const char *filename)
+{
+    for(int i = 0; i < ROOT_ENTRIES; i++)
+    {
+        char *currfile = (char *) mounteddisk->root->entries[i].filename;
+
+        if(strcmp(currfile, filename) == 0)
+            return &mounteddisk->root->entries[i];
+    }
+
+    return NULL;
+}
+
 //Search for file in root directory
 static int fileFound(const char *filename)
 {
@@ -153,7 +180,20 @@ static int validFilename(const char *filename)
     return SUCCESS;
 }
 
+//Check for file creation errors
+static int delete_err_check(const char *filename)
+{
+    //Case 1: Invalid filename
+    if(validFilename(filename) != SUCCESS)
+        return FAILURE;
 
+    //Case 2: File does not exist
+    if(fileFound(filename) != SUCCESS)
+        return FAILURE;
+
+    //Error check passed
+    return SUCCESS;
+}
 
 //Check for file creation errors
 static int create_err_check(const char *filename)
@@ -293,6 +333,26 @@ static void createNewDisk(const char *diskname)
     strcpy(mounteddisk->diskname, diskname);
 }
 
+//sets all fat blocks in a chain to FAT EOC
+static void clearFATChain(int start_index)
+{
+    int prev; 
+    int index = start_index;
+
+    while(mounteddisk->fat[index] != FAT_EOC){
+        prev = index;
+        index = mounteddisk->fat[index];
+        mounteddisk->fat[prev] = 0;
+    }
+}
+
+static void clearRootEntry(Rootentry* root_file)
+{
+    //Save file info to that root entry
+    root_file->filename[0] = '\0';
+    root_file->filesize = 0;
+    root_file->firstdatablockindex = 0;
+}
 
 //Free mounted disk
 static void freeDisk()
@@ -303,6 +363,7 @@ static void freeDisk()
     free(mounteddisk->root);
     free(mounteddisk);
 }
+
 
 
 int fs_mount(const char *diskname)
@@ -368,6 +429,13 @@ int fs_create(const char *filename)
     if(create_err_check(filename) != SUCCESS)
         return FAILURE;
 
+    //Find next open root entry
+    Rootentry* open = findNextEmpty();
+
+    //Save file info to that root entry
+    strcpy((char *) open->filename, filename);
+    open->filesize = 0;
+    open->firstdatablockindex = FAT_EOC;
 
     return SUCCESS;
 }
@@ -375,6 +443,17 @@ int fs_create(const char *filename)
 int fs_delete(const char *filename)
 {
     /* TODO: Phase 2 */
+
+    //Check for errors
+    if(delete_err_check(filename) != SUCCESS)
+        return FAILURE;
+
+    //return index of failure
+    Rootentry* root_file = findFile(filename);
+
+    clearFATChain(root_file->firstdatablockindex);
+
+    clearRootEntry(root_file);
 
     return SUCCESS;
 }
