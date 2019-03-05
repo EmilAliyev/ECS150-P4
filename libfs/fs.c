@@ -16,6 +16,7 @@
 #define SUPERBLOCK_INDEX 0
 #define SUPERBLOCK_UNUSED_BYTES 4079
 
+#define FAT_EOC 0xFFFF
 #define FIRST_FAT_BLOCK_INDEX 1
 
 #define ROOT_ENTRIES 128
@@ -66,6 +67,39 @@ typedef struct disk
 } disk;
 
 disk *mounteddisk = NULL;
+
+//Check if char ptr is string (null-terminated)
+static int isString(const char *ptr)
+{
+    while(*ptr)
+        ptr++;
+
+    if(*ptr != '\0')
+        return FAILURE;
+
+    else
+        return SUCCESS;
+
+}
+
+//Check if file name is valid
+static int validFilename(const char *filename)
+{
+
+    //Check for invalid filename errors
+
+    //Case 1: Filename not null-terminated
+    if(isString(filename) != SUCCESS)
+        return FAILURE;
+
+    //Case 2: Filename length exceeds maximum
+    if(strlen(filename) > FS_FILENAME_LEN)
+        return FAILURE;
+    
+    
+
+    return SUCCESS;
+}
 
 //Write the FAT back out to disk
 static void writeFAT()
@@ -271,6 +305,12 @@ int fs_info(void)
 int fs_create(const char *filename)
 {
     /* TODO: Phase 2 */
+    
+    //Error cases
+
+    //Case 1: Invalid filename
+    if(validFilename(filename) != SUCCESS)
+        return FAILURE;
 
     return SUCCESS;
 }
