@@ -66,33 +66,16 @@ disk *mounteddisk = NULL;
 static void copyFAT()
 {
 
-//not working yet, I'm working on it	
-//    for(int i = 1; i <= mounteddisk->superblock->numFATBlocks; i++){
-//        block_read(1, mounteddisk->fat);
-//    }
-}
-
-//Copy the blocks to the mounted disk
-static void copyBlocks()
-{
-
-    //Copy superblock
-    block_read(SUPERBLOCK_INDEX, mounteddisk->superblock);
-
-    //Get the index of the root directory
-    //int rootindex = (int) mounteddisk->superblock->numFATBlocks + 1;
-
-    //Copy the FAT
-    copyFAT();
-
-    //Copy root directory
-    block_read(mounteddisk->superblock->rootindex, mounteddisk->root);
+    printf("%d\n", mounteddisk->superblock->numFATBlocks);
+    for(int i = 1 + SUPERBLOCK_INDEX; i < mounteddisk->superblock->numFATBlocks; i++){
+        block_read(i, mounteddisk->fat + (i-1 * BLOCK_SIZE/2 * sizeof(uint16_t)));
+    }
 }
 
 //Create a new disk
 static void createNewDisk(const char *diskname)
 {
-    int namelength = strlen(diskname);
+    int namelength = strlen(diskname) + 1;
 
     mounteddisk = malloc(sizeof(disk));
     
@@ -100,11 +83,19 @@ static void createNewDisk(const char *diskname)
 
     //Allocate blocks
     mounteddisk->superblock = malloc(sizeof(Superblock));
-
+    
+    //Copy superblock
+    block_read(SUPERBLOCK_INDEX, mounteddisk->superblock);
+    
     //Number of entries in FAT is 2048 per block as each entry is 16 bits
     mounteddisk->fat = malloc(BLOCK_SIZE/2 * mounteddisk->superblock->numFATBlocks * sizeof(uint16_t));
+    
+    //Copy the FAT
+    copyFAT();
 
+    //Copy root directory
     mounteddisk->root = malloc(BLOCK_SIZE);
+    block_read(mounteddisk->superblock->rootindex, mounteddisk->root);
 
     strcpy(mounteddisk->diskname, diskname);
 }
@@ -123,8 +114,6 @@ static void freeDisk()
 
 int fs_mount(const char *diskname)
 {
-    /* TODO: Phase 1 */
-
     //Attempt to open disk.
      
     if(block_disk_open(diskname) != SUCCESS)
@@ -133,16 +122,11 @@ int fs_mount(const char *diskname)
     //Create new disk
     createNewDisk(diskname);
 
-    //Copy the blocks
-    copyBlocks();
-    
     return SUCCESS;
 }
 
 int fs_umount(void)
 {
-    /* TODO: Phase 1 */
-
     //Make sure disk is mounted
     if(mounteddisk == NULL)
         return FAILURE;
@@ -164,7 +148,9 @@ int fs_info(void)
     printf("data_blk=%d\n", mounteddisk->superblock->numFATBlocks + 2);
     printf("data_blk_count=%d\n", mounteddisk->superblock->numDataBlocks);
     
-    
+
+    //for
+
     //printf("fat_free_ratio=%d/%d\n", fat_free, BLOCK_SIZE * mounteddisk->superblock->numFATBlocks);
 
     //printf("rdir_free_ratio=%d/%d\n", mounteddisk->superblock->, mounteddisk->superblock->numDataBlocks);
