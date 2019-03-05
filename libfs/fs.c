@@ -91,16 +91,28 @@ static int rootEntryFree(Rootentry entry)
     return SUCCESS;
 }
 
-//Check if root directory has space
-static int freeRootEntryFound()
+//Get the number of empty entries in root directory
+static int numEmptyEntriesRootDir()
 {
+    int numFreeEntries = 0;
+
+    //An empty entry is defined by the first character of the entry's filename being the NULL character
     for(int i = 0; i < ROOT_ENTRIES; i++)
     {
         if(rootEntryFree(mounteddisk->root->entries[i]) == SUCCESS)
-            return SUCCESS;
-    }
+            numFreeEntries++;
+    }    
 
-    return FAILURE;
+    return numFreeEntries;
+}
+
+//Check if root directory has space
+static int freeRootEntryFound()
+{
+    if(numEmptyEntriesRootDir() == 0)
+        return FAILURE;
+
+    return SUCCESS;
 }
 
 //Check if file name is valid
@@ -226,21 +238,6 @@ static int numFreeDataBlocks()
     
 
     return numFreeBlocks;
-}
-
-//Get the number of empty entries in root directory
-static int numEmptyEntriesRootDir()
-{
-    int numFreeEntries = 0;
-
-    //An empty entry is defined by the first character of the entry's filename being the NULL character
-    for(int i = 0; i < ROOT_ENTRIES; i++)
-    {
-        if(rootEntryFree(mounteddisk->root->entries[i]) == SUCCESS)
-            numFreeEntries++;
-    }    
-
-    return numFreeEntries;
 }
 
 //Create a new disk
