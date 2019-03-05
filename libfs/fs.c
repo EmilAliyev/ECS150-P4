@@ -76,9 +76,8 @@ static void copyFAT()
 
 }
 
-
-//Make sure disk has valid format
-static int validFormat()
+//Make sure the disk's signature is valid
+static int validSignature()
 {
     char signature[SIGNATURE_BYTES + 1];
 
@@ -92,6 +91,16 @@ static int validFormat()
     
     //Check the signature
     if(strcmp(signature, FS_SIGNATURE) != 0)
+        return FAILURE;
+
+    return SUCCESS;
+}
+
+//Make sure disk has a valid format
+static int validFormat()
+{
+    //Check the signature
+    if(validSignature() != SUCCESS)
         return FAILURE;
 
     return SUCCESS;
