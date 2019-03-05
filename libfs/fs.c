@@ -67,10 +67,23 @@ typedef struct disk
 
 disk *mounteddisk = NULL;
 
+//WRite the FAT back out to disk
+static void writeFAT()
+{
+
+}
+
 //Write blocks back out to disk
 static void writeBlocks()
 {
+    //Write the superblock
+    block_write(SUPERBLOCK_INDEX, mounteddisk->superblock);
 
+    //Write the FAT
+    writeFAT();
+
+    //Write the root directory
+    block_write(mounteddisk->superblock->rootindex, mounteddisk->root);
 }
 
 //Copy the FAT of the mounted disk
