@@ -76,19 +76,27 @@ static void copyFAT()
 
 }
 
-/*
+
 //Make sure disk has valid format
 static int validFormat()
 {
-    int64_t correctSignature = (int64_t) FS_SIGNATURE;
+    char signature[SIGNATURE_BYTES + 1];
+
+    //Turn the signature into a string
+    for(int i = 0; i < SIGNATURE_BYTES; i++)
+    {
+        signature[i] = mounteddisk->superblock->signature[i];
+    }
+
+    signature[SIGNATURE_BYTES] = '\0';
     
     //Check the signature
-    if(mounteddisk->superblock->signature != correctSignature)
+    if(strcmp(signature, FS_SIGNATURE) != 0)
         return FAILURE;
 
     return SUCCESS;
 }
-*/
+
 
 //Get the number of free data blocks from the fat
 static int numFreeDataBlocks()
@@ -172,17 +180,13 @@ int fs_mount(const char *diskname)
     if(block_disk_open(diskname) != SUCCESS)
         return FAILURE;
 
-    //Check the format
-
-    /*
-    if(validFormat() != SUCCESS)
-        return FAILURE;
-    */
-
-    
-
     //Create new disk
     createNewDisk(diskname);
+
+    //Check the format
+
+    if(validFormat() != SUCCESS)
+        return FAILURE;
 
     return SUCCESS;
 }
