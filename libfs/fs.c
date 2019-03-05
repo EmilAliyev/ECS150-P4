@@ -96,11 +96,24 @@ static int validSignature()
     return SUCCESS;
 }
 
+//Check to ensure the mounted disk has the correct block count
+static int checkBlockCount()
+{
+    if(mounteddisk->superblock->numBlocks != block_disk_count())
+        return FAILURE;
+
+    return SUCCESS;
+}
+
 //Make sure disk has a valid format
 static int validFormat()
 {
     //Check the signature
     if(validSignature() != SUCCESS)
+        return FAILURE;
+
+    //Check the block count
+    if(checkBlockCount() != SUCCESS)
         return FAILURE;
 
     return SUCCESS;
