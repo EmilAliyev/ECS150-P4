@@ -463,6 +463,16 @@ int fs_ls(void)
     /* TODO: Phase 2 */
 
     printf("FS Ls:\n");
+    
+    for(int i = 0; i < ROOT_ENTRIES; i++)
+    {
+        if(rootEntryFree(mounteddisk->root->entries[i]) != SUCCESS)
+        {
+            printf("file: %s,", mounteddisk->root->entries[i].filename);
+            printf(" size: %d,", mounteddisk->root->entries[i].filesize);
+            printf(" data_blk: %hu\n", mounteddisk->root->entries[i].firstdatablockindex);
+        }
+    }   
 
     return SUCCESS;
 }
