@@ -93,7 +93,16 @@ static int numFreeDataBlocks()
 //Get the number of empty entries in root directory
 static int numEmptyEntriesRootDir()
 {
-    return 0;
+    int numFreeEntries = 0;
+
+    //An empty entry is defined by the first character of the entry's filename being the NULL character
+    for(int i = 0; i < ROOT_ENTRIES; i++)
+    {
+        if(mounteddisk->root->entries[i].filename[0] == '\0')
+            numFreeEntries++;
+    }    
+
+    return numFreeEntries;
 }
 
 //Create a new disk
