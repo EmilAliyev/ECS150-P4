@@ -67,9 +67,7 @@ disk *mounteddisk = NULL;
 //Copy the FAT of the mounted disk
 static void copyFAT()
 {
-
-    printf("%d\n", mounteddisk->superblock->numFATBlocks);
-    for(int i = 0 + FIRST_FAT_BLOCK_INDEX; i < mounteddisk->superblock->numFATBlocks + FIRST_FAT_BLOCK_INDEX; i++){
+    for(int i = FIRST_FAT_BLOCK_INDEX; i < mounteddisk->superblock->numFATBlocks + FIRST_FAT_BLOCK_INDEX; i++){
         block_read(i, &mounteddisk->fat[(i-1) * (BLOCK_SIZE/2)]);
     }
 
