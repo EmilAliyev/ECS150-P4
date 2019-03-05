@@ -73,6 +73,18 @@ static void copyFAT()
 
 }
 
+//Get the number of free data blocks from the fat
+static int numFreeDataBlocks()
+{
+    return 0;
+}
+
+//Get the number of empty entries in root directory
+static int numEmptyEntriesRootDir()
+{
+    return 0;
+}
+
 //Create a new disk
 static void createNewDisk(const char *diskname)
 {
@@ -150,13 +162,8 @@ int fs_info(void)
     printf("rdir_blk=%d\n", mounteddisk->superblock->numFATBlocks + 1);
     printf("data_blk=%d\n", mounteddisk->superblock->numFATBlocks + 2);
     printf("data_blk_count=%d\n", mounteddisk->superblock->numDataBlocks);
-    
-
-    //for
-
-    //printf("fat_free_ratio=%d/%d\n", fat_free, BLOCK_SIZE * mounteddisk->superblock->numFATBlocks);
-
-    //printf("rdir_free_ratio=%d/%d\n", mounteddisk->superblock->, mounteddisk->superblock->numDataBlocks);
+    printf("fat_free_ratio=%d/%d\n", numFreeDataBlocks(), mounteddisk->superblock->numDataBlocks);
+    printf("rdir_free_ratio=%d/%d\n", numEmptyEntriesRootDir(), ROOT_ENTRIES);
     
     return SUCCESS;
 }
