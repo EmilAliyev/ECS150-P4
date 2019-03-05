@@ -236,7 +236,7 @@ static int numEmptyEntriesRootDir()
     //An empty entry is defined by the first character of the entry's filename being the NULL character
     for(int i = 0; i < ROOT_ENTRIES; i++)
     {
-        if(mounteddisk->root->entries[i].filename[0] == '\0')
+        if(entryFree(mounteddisk->root->entries[i]) == SUCCESS)
             numFreeEntries++;
     }    
 
