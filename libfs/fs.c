@@ -82,6 +82,27 @@ static int isString(const char *ptr)
 
 }
 
+//Check if root directory entry is free
+static int entryFree(Rootentry entry)
+{
+    if(entry.filename[0] != '\0')
+        return FAILURE;
+
+    return SUCCESS;
+}
+
+//Check if root directory has space
+static int freeRootEntryFound()
+{
+    for(int i = 0; i < ROOT_ENTRIES; i++)
+    {
+        if(entryFree(mounteddisk->root->entries[i]) == SUCCESS)
+            return SUCCESS;
+    }
+
+    return FAILURE;
+}
+
 //Check if file name is valid
 static int validFilename(const char *filename)
 {
@@ -106,6 +127,10 @@ static int create_err_check(const char *filename)
 {
     //Case 1: Invalid filename
     if(validFilename(filename) != SUCCESS)
+        return FAILURE;
+
+    //Case 2: No space in root directory
+    if(freeRootEntryFound() != SUCCESS)
         return FAILURE;
 
     //Error check passed
