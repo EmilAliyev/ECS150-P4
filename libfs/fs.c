@@ -67,10 +67,13 @@ typedef struct disk
 
 disk *mounteddisk = NULL;
 
-//WRite the FAT back out to disk
+//Write the FAT back out to disk
 static void writeFAT()
 {
-
+    for(int i = FIRST_FAT_BLOCK_INDEX; i < mounteddisk->superblock->numFATBlocks + FIRST_FAT_BLOCK_INDEX; i++)
+    {
+        block_write(i, &mounteddisk->fat[(i-1) * (BLOCK_SIZE/2)]);
+    }
 }
 
 //Write blocks back out to disk
