@@ -131,6 +131,8 @@ int fs_umount(void)
     if(mounteddisk == NULL)
         return FAILURE;
     
+    //Close the disk
+    block_disk_close();
 
     //Free the disk
     freeDisk();
