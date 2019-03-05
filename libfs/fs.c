@@ -13,6 +13,8 @@
 #define SUPERBLOCK_INDEX 0
 #define SUPERBLOCK_UNUSED_BYTES 4079
 
+#define FIRST_FAT_BLOCK_INDEX 1
+
 #define ROOT_ENTRIES 128
 #define ROOT_FILENAME_SIZE 16
 #define ROOT_ENTRY_UNUSED_BYTES 10
@@ -67,9 +69,10 @@ static void copyFAT()
 {
 
     printf("%d\n", mounteddisk->superblock->numFATBlocks);
-    for(int i = 1 + SUPERBLOCK_INDEX; i < mounteddisk->superblock->numFATBlocks; i++){
-        block_read(i, mounteddisk->fat + (i-1 * BLOCK_SIZE/2 * sizeof(uint16_t)));
+    for(int i = 0 + FIRST_FAT_BLOCK_INDEX; i < mounteddisk->superblock->numFATBlocks + FIRST_FAT_BLOCK_INDEX; i++){
+        block_read(i, &mounteddisk->fat[(i-1) * (BLOCK_SIZE/2)]);
     }
+
 }
 
 //Create a new disk
