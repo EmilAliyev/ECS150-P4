@@ -106,13 +106,18 @@ static int numEmptyEntriesRootDir()
     return numFreeEntries;
 }
 
-//Check if root directory has space
-static int freeRootEntryFound()
+//Get the number of files in the root directory
+static int numFilesRootDir()
 {
-    if(numEmptyEntriesRootDir() == 0)
-        return FAILURE;
+    int numfiles = 0;
 
-    return SUCCESS;
+    for(int i = 0; i < ROOT_ENTRIES; i++)
+    {
+        if(rootEntryFree(mounteddisk->root->entries[i]) != SUCCESS)
+            numfiles++;
+    }
+
+    return numfiles;
 }
 
 //Check if file name is valid
@@ -142,7 +147,7 @@ static int create_err_check(const char *filename)
         return FAILURE;
 
     //Case 2: No space in root directory
-    if(freeRootEntryFound() != SUCCESS)
+    if(numFilesRootDir() == FS_FILE_MAX_COUNT)
         return FAILURE;
 
     //Error check passed
