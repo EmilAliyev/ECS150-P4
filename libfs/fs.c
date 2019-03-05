@@ -120,6 +120,20 @@ static int numFilesRootDir()
     return numfiles;
 }
 
+//Search for file in root directory
+static int fileFound(const char *filename)
+{
+    for(int i = 0; i < ROOT_ENTRIES; i++)
+    {
+        char *currfile = (char *) mounteddisk->root->entries[i].filename;
+
+        if(strcmp(currfile, filename) == 0)
+            return SUCCESS;
+    }
+
+    return FAILURE;
+}
+
 //Check if file name is valid
 static int validFilename(const char *filename)
 {
@@ -139,6 +153,8 @@ static int validFilename(const char *filename)
     return SUCCESS;
 }
 
+
+
 //Check for file creation errors
 static int create_err_check(const char *filename)
 {
@@ -148,6 +164,10 @@ static int create_err_check(const char *filename)
 
     //Case 2: No space in root directory
     if(numFilesRootDir() == FS_FILE_MAX_COUNT)
+        return FAILURE;
+
+    //Case 3: File already exists
+    if(fileFound(filename) == SUCCESS)
         return FAILURE;
 
     //Error check passed
