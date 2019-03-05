@@ -146,10 +146,16 @@ static void freeDisk()
 
 int fs_mount(const char *diskname)
 {
+    //Make sure no disk is mounted
+    if(mounteddisk != NULL)
+        return FAILURE;
+
     //Attempt to open disk.
      
     if(block_disk_open(diskname) != SUCCESS)
         return FAILURE;
+
+    
 
     //Create new disk
     createNewDisk(diskname);
