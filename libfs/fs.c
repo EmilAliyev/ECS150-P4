@@ -101,6 +101,17 @@ static int validFilename(const char *filename)
     return SUCCESS;
 }
 
+//Check for file creation errors
+static int create_err_check(const char *filename)
+{
+    //Case 1: Invalid filename
+    if(validFilename(filename) != SUCCESS)
+        return FAILURE;
+
+    //Error check passed
+    return SUCCESS;
+}
+
 //Write the FAT back out to disk
 static void writeFAT()
 {
@@ -306,11 +317,10 @@ int fs_create(const char *filename)
 {
     /* TODO: Phase 2 */
     
-    //Error cases
-
-    //Case 1: Invalid filename
-    if(validFilename(filename) != SUCCESS)
+    //Check for errors
+    if(create_err_check(filename) != SUCCESS)
         return FAILURE;
+
 
     return SUCCESS;
 }
