@@ -8,7 +8,10 @@
 #include "fs.h"
 
 /* TODO: Phase 1 */
+#define FS_SIGNATURE "ECS150FS"
 #define BLOCK_SIZE 4096
+
+#define SIGNATURE_BYTES 8
 
 #define SUPERBLOCK_INDEX 0
 #define SUPERBLOCK_UNUSED_BYTES 4079
@@ -25,7 +28,7 @@
 //Superblock
 typedef struct Superblock
 {
-    int64_t signature; //Signature (must be equal to "ECS150FS")
+    int8_t signature[SIGNATURE_BYTES]; //Signature (must be equal to "ECS150FS")
     int16_t numBlocks; //Total amount of blocks of virtual disk
     int16_t rootindex; //Root directory block index
     int16_t datastartindex; //Data block start index
@@ -72,6 +75,20 @@ static void copyFAT()
     }
 
 }
+
+/*
+//Make sure disk has valid format
+static int validFormat()
+{
+    int64_t correctSignature = (int64_t) FS_SIGNATURE;
+    
+    //Check the signature
+    if(mounteddisk->superblock->signature != correctSignature)
+        return FAILURE;
+
+    return SUCCESS;
+}
+*/
 
 //Get the number of free data blocks from the fat
 static int numFreeDataBlocks()
@@ -154,6 +171,13 @@ int fs_mount(const char *diskname)
      
     if(block_disk_open(diskname) != SUCCESS)
         return FAILURE;
+
+    //Check the format
+
+    /*
+    if(validFormat() != SUCCESS)
+        return FAILURE;
+    */
 
     
 
