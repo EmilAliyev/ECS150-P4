@@ -67,6 +67,12 @@ typedef struct disk
 
 disk *mounteddisk = NULL;
 
+//Write blocks back out to disk
+static void writeBlocks()
+{
+
+}
+
 //Copy the FAT of the mounted disk
 static void copyFAT()
 {
@@ -219,6 +225,9 @@ int fs_umount(void)
     if(mounteddisk == NULL)
         return FAILURE;
     
+    //Write blocks back out to disk
+    writeBlocks();
+
     //Close the disk
     block_disk_close();
 
