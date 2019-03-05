@@ -76,11 +76,10 @@ static void copyFAT()
 //Get the number of free data blocks from the fat
 static int numFreeDataBlocks()
 {
-    int numFatEntries = BLOCK_SIZE/2 * mounteddisk->superblock->numFATBlocks;
     int numFreeBlocks = 0;
 
     //A FAT entry of 0 corresponds to a free data block
-    for(int i = 0; i < numFatEntries; i++)
+    for(int i = 0; i < mounteddisk->superblock->numDataBlocks; i++)
     {
         if(mounteddisk->fat[i] == 0)
             numFreeBlocks++;
@@ -176,7 +175,7 @@ int fs_umount(void)
 int fs_info(void)
 {
     //Print info
-    printf("FS info:\n");
+    printf("FS Info:\n");
     printf("total_blk_count=%d\n", mounteddisk->superblock->numBlocks);
     printf("fat_blk_count=%d\n", mounteddisk->superblock->numFATBlocks);
     printf("rdir_blk=%d\n", mounteddisk->superblock->numFATBlocks + 1);
