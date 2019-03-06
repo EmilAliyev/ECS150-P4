@@ -26,6 +26,15 @@
 #define SUCCESS 0
 #define FAILURE -1
 
+#define FILE_NUM 32
+
+//file info 
+typedef struct Fileinfo
+{
+    int32_t offset; //offset of the file (bytes), 0 on open
+
+} __attribute__((packed)) Fileinfo;
+
 //Superblock
 typedef struct Superblock
 {
@@ -67,6 +76,8 @@ typedef struct disk
 } disk;
 
 disk *mounteddisk = NULL;
+
+struct Fileinfo openfiles[FILE_NUM]; 
 
 //Check if char ptr is string (null-terminated)
 static int isString(const char *ptr)
@@ -479,9 +490,21 @@ int fs_ls(void)
 
 int fs_open(const char *filename)
 {
-    /* TODO: Phase 3 */
 
-    return SUCCESS;
+    struct Fileinfo new;
+    new.offset = 0;
+    //get root info/ data block info for file
+
+    //make file info for file and place it in empty table slot
+    for(int i = 0; i < FILE_NUM; i++){
+        if(&openfiles[i] == NULL){
+            openfiles[i] = new;
+            //return index of file info in table
+	    return i;
+	}
+    }
+
+    return FAILURE;
 }
 
 int fs_close(int fd)
