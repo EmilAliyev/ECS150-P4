@@ -244,6 +244,15 @@ static int valid_fd(int fd)
     return SUCCESS;
 }
 
+//Check for stat errors
+static int stat_err_check(int fd)
+{
+    if(valid_fd(fd) != SUCCESS)
+        return FAILURE;
+
+    return SUCCESS;
+}
+
 //Check for seek errors
 static int lseek_err_check(int fd, size_t offset)
 {
@@ -624,6 +633,13 @@ int fs_close(int fd)
 int fs_stat(int fd)
 {
     /* TODO: Phase 3 */
+
+    //Check for errors
+    if(stat_err_check(fd) != SUCCESS)
+        return FAILURE;
+
+    
+
     return SUCCESS;
 }
 
