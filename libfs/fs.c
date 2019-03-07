@@ -85,10 +85,29 @@ disk *mounteddisk = NULL;
 
 struct Fileinfo openfiles[FILE_NUM]; 
 
+//Use FAT to get the next data block in the chain
+static int nextBlock(int currentBlock)
+{
+    return mounteddisk->fat[currentBlock];
+}
+
 //Find data block at fd's offset
 static int getDataBlock(int fd)
 {
-    return 0;
+    //Get the starting data block
+    int currBlock = openfiles[fd].first_block;
+
+    //Get the offset
+    int offset = openfiles[fd].total_offset;
+
+    //Go to next block until offset is less than block size
+    while(offset > BLOCK_SIZE)
+    {
+        currBlock = nextBlock(currBlock);
+        offset -= BLOCK_SIZE;
+    }
+
+    return currBlock;
 }
 
 //Check if char ptr is string (null-terminated)
