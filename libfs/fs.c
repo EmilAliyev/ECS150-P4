@@ -207,9 +207,38 @@ static int fileTableSpaceAvailable()
     return FAILURE;
 }
 
+//Check if fd is open
+static int isOpen(int fd)
+{
+    if(openfiles[fd].open != 1)
+        return FAILURE;
+
+    return SUCCESS;
+}
+
+//Check if file descriptor is within bounds
+static int fd_in_bounds(int fd)
+{
+    if(fd > FILE_NUM)
+        return FAILURE;
+
+    if(fd < 0)
+        return FAILURE;
+
+    return SUCCESS;
+}
+
 //Check for file closing errors
 static int close_err_check(int fd)
 {
+    //Case 1: fd out of bounds
+    if(fd_in_bounds(fd) != SUCCESS)
+        return FAILURE;
+
+    //Case 2: fd not open
+    if(isOpen(fd) != SUCCESS)
+        return FAILURE;
+
     return SUCCESS;
 }
 
