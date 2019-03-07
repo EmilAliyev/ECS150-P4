@@ -36,6 +36,8 @@ typedef struct Fileinfo
     int32_t total_offset; //total offset
     int16_t block; //current block
     int16_t first_block; //first block
+    int16_t size;
+
 
 } __attribute__((packed)) Fileinfo;
 
@@ -534,8 +536,6 @@ int fs_info(void)
 
 int fs_create(const char *filename)
 {
-    /* TODO: Phase 2 */
-    
     //Check for errors
     if(create_err_check(filename) != SUCCESS)
         return FAILURE;
@@ -553,8 +553,6 @@ int fs_create(const char *filename)
 
 int fs_delete(const char *filename)
 {
-    /* TODO: Phase 2 */
-
     //Check for errors
     if(delete_err_check(filename) != SUCCESS)
         return FAILURE;
@@ -571,8 +569,6 @@ int fs_delete(const char *filename)
 
 int fs_ls(void)
 {
-    /* TODO: Phase 2 */
-
     printf("FS Ls:\n");
     
     for(int i = 0; i < ROOT_ENTRIES; i++)
