@@ -1,7 +1,6 @@
 #ECS 150 Project 4 Report
 
 Emil Aliyev
-
 Noah White
 
 ##Introduction
@@ -68,7 +67,20 @@ We implemented the root directory as a data structure containing 128 of another 
 	} __attribute__((packed)) Rootdirectory;
 
 ##Phase 2
+	
 
 ##Phase 3
+
+####File Information Structs
+We have a file array, containing all open files. Each open file is represented
+by a file info struct. Each file info struct contains the following fields:
+
+	open: an integer value that indicates if the file has been closed
+	block_offset: Where the cursor is located in relation to the start of
+		the current block
+	total_offset: Where the cursor is located in relation to the start of
+		the file
+	block: The current block the offset is at
+	first_block: The first block of the current file
 
 ##Phase 4
