@@ -207,6 +207,12 @@ static int fileTableSpaceAvailable()
     return FAILURE;
 }
 
+//Check for file closing errors
+static int close_err_check(int fd)
+{
+    return SUCCESS;
+}
+
 //Check for file opening errors
 static int open_err_check(const char *filename)
 {
@@ -560,6 +566,9 @@ int fs_open(const char *filename)
 
 int fs_close(int fd)
 {
+    if(close_err_check(fd) != SUCCESS)
+        return FAILURE;
+
     openfiles[fd].open = 0;
 
     return SUCCESS;
