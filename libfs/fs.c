@@ -244,9 +244,20 @@ static int valid_fd(int fd)
     return SUCCESS;
 }
 
+//Check for read errors
+static int read_err_check(int fd)
+{
+    //Case 1: invalid fd
+    if(valid_fd(fd) != SUCCESS)
+        return FAILURE;
+
+    return SUCCESS;
+}
+
 //Check for stat errors
 static int stat_err_check(int fd)
 {
+    //Case 1: invalid fd
     if(valid_fd(fd) != SUCCESS)
         return FAILURE;
 
@@ -667,6 +678,10 @@ int fs_write(int fd, void *buf, size_t count)
 int fs_read(int fd, void *buf, size_t count)
 {
     /* TODO: Phase 4 */
+
+    if(read_err_check(fd) != SUCCESS)
+        return FAILURE;
+
     return SUCCESS;
 }
 
