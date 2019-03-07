@@ -195,6 +195,18 @@ static int validFilename(const char *filename)
     return SUCCESS;
 }
 
+//Check for file opening errors
+static int open_err_check(const char *filename)
+{
+    //Case 1: Invalid filename
+
+    //Case 2: Filename not found
+
+    //Case 3: File table full
+
+    return SUCCESS;
+}
+
 //Check for file creation errors
 static int delete_err_check(const char *filename)
 {
@@ -506,6 +518,10 @@ int fs_open(const char *filename)
     struct Fileinfo new;
     new.total_offset = 0;
     new.block_offset = 0;
+
+    //Check for errors
+    if(open_err_check(filename) != SUCCESS)
+        return FAILURE;
 
     new.first_block = findFile(filename)->firstdatablockindex;
     new.block = new.first_block;
