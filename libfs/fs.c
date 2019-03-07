@@ -123,14 +123,16 @@ static int numBlocksToRead(int fd, size_t count)
     //Otherwise, at least 1 block must be read
     int numBlocks = 1;
 
+    signed int numBytes = (signed int) count;
+
     //Subtract the bytes that must be read from the first block
-    count -= BLOCK_SIZE - openfiles[fd].block_offset;
+    numBytes -= (BLOCK_SIZE - openfiles[fd].block_offset);
 
     //Every 4096 bytes means another block needs to be read
-    while(count < 0)
+    while(numBytes > 0)
     {
         numBlocks++;
-        count -= BLOCK_SIZE;
+        numBytes -= BLOCK_SIZE;
     }
 
     return numBlocks;
@@ -742,9 +744,15 @@ int fs_read(int fd, void *buf, size_t count)
     //Allocate dummy buffer to store all blocks
     uint8_t *tempbuf = malloc(numBlocks * BLOCK_SIZE);
 
+    size_t bytesRead = 0;
+
     //Read the first block into the dummy buffer
     
     block_read(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
+    bytesRead += BLOCK_SIZE;
+
+    //Read the remaining bytes
+    
     
     free(tempbuf);
 
