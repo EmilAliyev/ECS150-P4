@@ -91,6 +91,34 @@ static int nextBlock(int currentBlock)
     return mounteddisk->fat[currentBlock];
 }
 
+//return the first availible fat entry
+static int findFreeFAT()
+{
+    for(int i = 0; i < BLOCK_SIZE/2 * mounteddisk->superblock->numFATBlocks; i++)
+    {
+        if(mounteddisk->fat[i] == 0)
+        {
+            return i;
+        }
+    }
+
+    return FAILURE;
+}
+
+//sets up a new fat entry
+static int allocNewFATEntry(int currentBlock)
+{
+    int block = findFreeFAT();
+
+    if(block == FAILURE)
+         return FAILURE;
+
+    mounteddisk->fat[currentBlock] = block;
+    mounteddisk->fat[block] = FAT_EOC;
+    
+    return block;
+}
+
 //Find data block at fd's offset
 static int getDataBlock(int fd)
 {
@@ -724,14 +752,49 @@ int fs_lseek(int fd, size_t offset)
 
 int fs_write(int fd, void *buf, size_t count)
 {
-    /* TODO: Phase 4 */
+
+
+
+    //Find the starting data block (the data block at the offset)
+    int dataBlock = getDataBlock(fd);
+
+    //Get the number of blocks that must be read
+    int numBlocks = numBlocksToRead(fd, count);
+
+    //Allocate dummy buffer to store data to be written
+    uint8_t *tempbuf = malloc(numBlocks * BLOCK_SIZE);
+    
+    //read from first block to buffer, then modify point after offset
+    block_read(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
+    memcpy(&tempbuf[openfiles[fd].block_offset], buf, count);
+    
+    //write to the first block 
+    block_write(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
+
+    numBlocks--;
+ 
+    //Read the remaining blocks
+    for(int i = 0; i < numBlocks; i++)
+    {
+        //Get the next block
+        dataBlock = nextBlock(dataBlock);
+
+	if(dataBlock == FAT_EOC){
+            dataBlock = allocNewFATEntry(dataBlock);
+	}
+
+        //Write to it
+        block_write(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
+    }
+
+   
+    //write to the remaining blocks
+
     return SUCCESS;
 }
 
 int fs_read(int fd, void *buf, size_t count)
 {
-    /* TODO: Phase 4 */
-
     if(read_err_check(fd) != SUCCESS)
         return FAILURE;
 
@@ -746,7 +809,6 @@ int fs_read(int fd, void *buf, size_t count)
 
     //Read the first block into the dummy buffer
     block_read(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);   
-
 
     numBlocks--;
 
