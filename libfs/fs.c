@@ -85,6 +85,12 @@ disk *mounteddisk = NULL;
 
 struct Fileinfo openfiles[FILE_NUM]; 
 
+//Find data block at fd's offset
+static int getDataBlock(int fd)
+{
+    return 0;
+}
+
 //Check if char ptr is string (null-terminated)
 static int isString(const char *ptr)
 {
@@ -681,6 +687,11 @@ int fs_read(int fd, void *buf, size_t count)
 
     if(read_err_check(fd) != SUCCESS)
         return FAILURE;
+
+    //Find the starting data block (the data block at the offset)
+    getDataBlock(fd);
+
+    
 
     return SUCCESS;
 }
