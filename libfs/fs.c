@@ -107,7 +107,33 @@ static int getDataBlock(int fd)
         offset -= BLOCK_SIZE;
     }
 
+    //Set the block offset
+    openfiles[fd].block_offset = offset;
+
     return currBlock;
+}
+
+//Calculate the number of blocks that must be read
+static int numBlocksToRead(int fd, size_t count)
+{
+    //If count is 0, no blocks need to be read
+    if(count == 0)
+        return 0;
+
+    //Otherwise, at least 1 block must be read
+    int numBlocks = 1;
+
+    //Subtract the bytes that must be read from the first block
+    count -= BLOCK_SIZE - openfiles[fd].block_offset;
+
+    //Every 4096 bytes means another block needs to be read
+    while(count > 0)
+    {
+        numBlocks++;
+        count -= BLOCK_SIZE;
+    }
+
+    return numBlocks;
 }
 
 //Check if char ptr is string (null-terminated)
@@ -709,6 +735,9 @@ int fs_read(int fd, void *buf, size_t count)
 
     //Find the starting data block (the data block at the offset)
     getDataBlock(fd);
+
+    //Get the number of blocks that must be read
+    numBlocksToRead(fd, count);
 
     
 
