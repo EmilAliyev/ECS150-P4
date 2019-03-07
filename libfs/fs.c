@@ -641,11 +641,8 @@ int fs_stat(int fd)
     if(stat_err_check(fd) != SUCCESS)
         return FAILURE;
 
-    
-
-    
-
-    return SUCCESS;
+    //Return the file size
+    return openfiles[fd].size;
 }
 
 int fs_lseek(int fd, size_t offset)
