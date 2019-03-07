@@ -633,6 +633,9 @@ int fs_lseek(int fd, size_t offset)
     if(lseek_err_check(fd, offset) != SUCCESS)
         return FAILURE;
 
+    //Set offset of file fd
+    openfiles[fd].total_offset = offset;
+
 
     return SUCCESS;
 }
