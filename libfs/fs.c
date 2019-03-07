@@ -31,7 +31,10 @@
 //file info 
 typedef struct Fileinfo
 {
-    int32_t offset; //offset of the file (bytes), 0 on open
+    int32_t block_offset; //offset on the block (bytes), 0 on open
+    int32_t total_offset; //total offset
+    int16_t block; //current block
+    int16_t first_block; //first block
 
 } __attribute__((packed)) Fileinfo;
 
@@ -490,10 +493,12 @@ int fs_ls(void)
 
 int fs_open(const char *filename)
 {
-
     struct Fileinfo new;
-    new.offset = 0;
-    //get root info/ data block info for file
+    new.total_offset = 0;
+    new.block_offset = 0;
+
+    new.first_block = findFile(filename)->firstdatablockindex;
+    new.block = new.first_block;
 
     //make file info for file and place it in empty table slot
     for(int i = 0; i < FILE_NUM; i++){
@@ -509,7 +514,8 @@ int fs_open(const char *filename)
 
 int fs_close(int fd)
 {
-    /* TODO: Phase 3 */
+    //&openfiles[i] = NULL;
+
     return SUCCESS;
 }
 
