@@ -228,15 +228,37 @@ static int fd_in_bounds(int fd)
     return SUCCESS;
 }
 
-//Check for file closing errors
-static int close_err_check(int fd)
+//Check to make sure file descriptor is valid
+static int valid_fd(int fd)
 {
-    //Case 1: fd out of bounds
+    //Case 1: fd not in bounds
     if(fd_in_bounds(fd) != SUCCESS)
         return FAILURE;
 
     //Case 2: fd not open
     if(isOpen(fd) != SUCCESS)
+        return FAILURE;
+
+    return SUCCESS;
+}
+
+//Check for seek errors
+static int lseek_err_check(int fd, size_t offset)
+{
+    //Case 1: invalid fd
+    if(valid_fd(fd) != SUCCESS)
+        return FAILURE;
+
+    //Case 2: offset out of bounds
+
+    return SUCCESS;
+}
+
+//Check for file closing errors
+static int close_err_check(int fd)
+{
+    //Case 1: invalid fd
+    if(valid_fd(fd) != SUCCESS)
         return FAILURE;
 
     return SUCCESS;
@@ -612,6 +634,10 @@ int fs_stat(int fd)
 int fs_lseek(int fd, size_t offset)
 {
     /* TODO: Phase 3 */
+    if(lseek_err_check(fd, offset) != SUCCESS)
+        return FAILURE;
+
+
     return SUCCESS;
 }
 
