@@ -744,14 +744,24 @@ int fs_read(int fd, void *buf, size_t count)
     //Allocate dummy buffer to store all blocks
     uint8_t *tempbuf = malloc(numBlocks * BLOCK_SIZE);
 
-    size_t bytesRead = 0;
-
     //Read the first block into the dummy buffer
-    
-    block_read(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
-    bytesRead += BLOCK_SIZE;
+    block_read(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);   
 
-    //Read the remaining bytes
+
+    numBlocks--;
+
+    //Read the remaining blocks
+    for(int i = 0; i < numBlocks; i++)
+    {
+        //Get the next block
+        dataBlock = nextBlock(dataBlock);
+
+        //Read it
+        block_read(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
+    }
+
+    //Copy from temporary buffer, starting at the block offset
+    memcpy(buf, &tempbuf[openfiles[fd].block_offset], count);
     
     
     free(tempbuf);
