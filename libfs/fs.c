@@ -36,7 +36,7 @@ typedef struct Fileinfo
     int32_t total_offset; //total offset
     int16_t block; //current block
     int16_t first_block; //first block
-    int16_t size;
+    int16_t size; //The size of the file
 
 
 } __attribute__((packed)) Fileinfo;
@@ -603,7 +603,10 @@ int fs_open(const char *filename)
     if(open_err_check(filename) != SUCCESS)
         return FAILURE;
 
-    new.first_block = findFile(filename)->firstdatablockindex;
+    Rootentry *fileentry = findFile(filename);
+
+    new.first_block = fileentry->firstdatablockindex;
+    new.size = fileentry->filesize;
     new.block = new.first_block;
     new.open = 1;
 
@@ -637,6 +640,8 @@ int fs_stat(int fd)
     //Check for errors
     if(stat_err_check(fd) != SUCCESS)
         return FAILURE;
+
+    
 
     
 
