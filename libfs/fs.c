@@ -195,14 +195,32 @@ static int validFilename(const char *filename)
     return SUCCESS;
 }
 
+//Check if file table has space
+static int fileTableSpaceAvailable()
+{
+    for(int i = 0; i < FILE_NUM; i++)
+    {
+        if(openfiles[i].open == 0)
+            return SUCCESS;
+    }
+
+    return FAILURE;
+}
+
 //Check for file opening errors
 static int open_err_check(const char *filename)
 {
     //Case 1: Invalid filename
+    if(validFilename(filename) != SUCCESS)
+        return FAILURE;
 
     //Case 2: Filename not found
+    if(fileFound(filename) != SUCCESS)
+        return FAILURE;
 
     //Case 3: File table full
+    if(fileTableSpaceAvailable() != SUCCESS)
+        return FAILURE;
 
     return SUCCESS;
 }
