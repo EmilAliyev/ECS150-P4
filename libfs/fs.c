@@ -38,7 +38,6 @@ typedef struct Fileinfo
     int16_t first_block; //first block
     int16_t size; //The size of the file
 
-
 } __attribute__((packed)) Fileinfo;
 
 //Superblock
@@ -102,6 +101,8 @@ static int findFreeFAT()
         }
     }
 
+    printf("No free FAT\n");
+
     return FAILURE;
 }
 
@@ -139,6 +140,31 @@ static int getDataBlock(int fd)
     openfiles[fd].block_offset = offset;
 
     return currBlock;
+}
+
+//Calculate the number of blocks that must be written
+static int numBlocksToWrite(int fd, size_t count)
+{
+    //If count is 0, no blocks need to be written
+    if(count == 0)
+        return 0;
+
+    //Otherwise, at least 1 block must be written
+    int numBlocks = 1;
+
+    signed int numBytes = (signed int) count;
+
+    //Subtract the written that must be read from the first block
+    numBytes -= (BLOCK_SIZE - openfiles[fd].block_offset);
+
+    //Every 4096 bytes means another block needs to be written
+    while(numBytes > 0)
+    {
+        numBlocks++;
+        numBytes -= BLOCK_SIZE;
+    }
+
+    return numBlocks;
 }
 
 //Calculate the number of blocks that must be read
@@ -727,8 +753,6 @@ int fs_close(int fd)
 
 int fs_stat(int fd)
 {
-    /* TODO: Phase 3 */
-
     //Check for errors
     if(stat_err_check(fd) != SUCCESS)
         return FAILURE;
@@ -739,7 +763,6 @@ int fs_stat(int fd)
 
 int fs_lseek(int fd, size_t offset)
 {
-    /* TODO: Phase 3 */
     if(lseek_err_check(fd, offset) != SUCCESS)
         return FAILURE;
 
@@ -752,14 +775,13 @@ int fs_lseek(int fd, size_t offset)
 
 int fs_write(int fd, void *buf, size_t count)
 {
-
-
+    //add checks
 
     //Find the starting data block (the data block at the offset)
     int dataBlock = getDataBlock(fd);
 
-    //Get the number of blocks that must be read
-    int numBlocks = numBlocksToRead(fd, count);
+    //Get the number of blocks that must be written
+    int numBlocks = numBlocksToWrite(fd, count);
 
     //Allocate dummy buffer to store data to be written
     uint8_t *tempbuf = malloc(numBlocks * BLOCK_SIZE);
@@ -773,22 +795,39 @@ int fs_write(int fd, void *buf, size_t count)
 
     numBlocks--;
  
-    //Read the remaining blocks
+    //write the remaining blocks
     for(int i = 0; i < numBlocks; i++)
     {
         //Get the next block
         dataBlock = nextBlock(dataBlock);
 
-	if(dataBlock == FAT_EOC){
+	if(dataBlock == FAT_EOC)
+        {
             dataBlock = allocNewFATEntry(dataBlock);
+
+            //return failure if no data blocks are open
+	    if(dataBlock == -1)
+            {
+                return FAILURE;
+	    }
 	}
+
+	//adjust offset
+        openfiles[fd].block = dataBlock;
 
         //Write to it
         block_write(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
+
+	printf("Writing to block %d\n", i);
     }
 
-   
-    //write to the remaining blocks
+    free(tempbuf);
+
+    //update fileinfo (size and offset) 
+    openfiles[fd].size = openfiles[fd].block_offset + count;
+    
+    //shift block offset here too
+    openfiles[fd].total_offset += count;
 
     return SUCCESS;
 }
@@ -818,15 +857,20 @@ int fs_read(int fd, void *buf, size_t count)
         //Get the next block
         dataBlock = nextBlock(dataBlock);
 
+	//adjust offset
+	openfiles[fd].block = dataBlock;
+
         //Read it
         block_read(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
     }
 
     //Copy from temporary buffer, starting at the block offset
     memcpy(buf, &tempbuf[openfiles[fd].block_offset], count);
-    
-    
+     
     free(tempbuf);
+
+    //shift fd offset here too
+    openfiles[fd].total_offset += count;
 
     return SUCCESS;
 }
