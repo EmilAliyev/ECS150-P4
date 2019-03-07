@@ -31,6 +31,7 @@
 //file info 
 typedef struct Fileinfo
 {
+    int8_t open; //Tells if file has been closed
     int32_t block_offset; //offset on the block (bytes), 0 on open
     int32_t total_offset; //total offset
     int16_t block; //current block
@@ -378,6 +379,13 @@ static void freeDisk()
     free(mounteddisk);
 }
 
+//set up file list
+static void setUpFileList()
+{
+    for(int i = 0; i < FILE_NUM; i++){
+        openfiles[i].open = 0;
+    }
+}
 
 
 int fs_mount(const char *diskname)
@@ -398,6 +406,8 @@ int fs_mount(const char *diskname)
 
     if(validFormat() != SUCCESS)
         return FAILURE;
+
+    setUpFileList();
 
     return SUCCESS;
 }
@@ -499,14 +509,16 @@ int fs_open(const char *filename)
 
     new.first_block = findFile(filename)->firstdatablockindex;
     new.block = new.first_block;
+    new.open = 1;
 
     //make file info for file and place it in empty table slot
     for(int i = 0; i < FILE_NUM; i++){
-        if(&openfiles[i] == NULL){
-            openfiles[i] = new;
+        if(openfiles[i].open == 0){
+            memcpy(&openfiles[i], &new, sizeof(Fileinfo));
             //return index of file info in table
 	    return i;
 	}
+
     }
 
     return FAILURE;
@@ -514,7 +526,7 @@ int fs_open(const char *filename)
 
 int fs_close(int fd)
 {
-    //&openfiles[i] = NULL;
+    openfiles[fd].open = 0;
 
     return SUCCESS;
 }
