@@ -28,18 +28,6 @@
 
 #define FILE_NUM 32
 
-//file info 
-typedef struct Fileinfo
-{
-    int8_t open; //Tells if file has been closed
-    int32_t block_offset; //offset on the block (bytes), 0 on open
-    int32_t total_offset; //total offset
-    int16_t block; //current block
-    int16_t first_block; //first block
-    int16_t size; //The size of the file
-
-} __attribute__((packed)) Fileinfo;
-
 //Superblock
 typedef struct Superblock
 {
@@ -70,6 +58,18 @@ typedef struct Rootdirecotry
 } __attribute__((packed)) Rootdirectory;
 
 typedef uint16_t* FAT;
+
+//file info 
+typedef struct Fileinfo
+{
+    int8_t open; //Tells if file has been closed
+    int32_t block_offset; //offset on the block (bytes), 0 on open
+    int32_t total_offset; //total offset
+    int16_t block; //current block
+    int16_t first_block; //first block
+    Rootentry* root;
+
+} __attribute__((packed)) Fileinfo;
 
 typedef struct disk
 {
@@ -724,9 +724,9 @@ int fs_open(const char *filename)
     Rootentry *fileentry = findFile(filename);
 
     new.first_block = fileentry->firstdatablockindex;
-    new.size = fileentry->filesize;
     new.block = new.first_block;
     new.open = 1;
+    new.root = fileentry;
 
     //make file info for file and place it in empty table slot
     for(int i = 0; i < FILE_NUM; i++){
@@ -758,7 +758,7 @@ int fs_stat(int fd)
         return FAILURE;
 
     //Return the file size
-    return openfiles[fd].size;
+    return openfiles[fd].root->filesize;
 }
 
 int fs_lseek(int fd, size_t offset)
@@ -789,9 +789,29 @@ int fs_write(int fd, void *buf, size_t count)
     //read from first block to buffer, then modify point after offset
     block_read(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
     memcpy(&tempbuf[openfiles[fd].block_offset], buf, count);
-    
-    //write to the first block 
-    block_write(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
+ 
+    printf("%d\n", dataBlock);
+
+    if(dataBlock != -1)
+    {
+        //write to the first block 
+        block_write(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
+    }
+    //in case file is uninitialized
+    else
+    {
+        //get new first block, save root stuff
+        dataBlock = findFreeFAT();
+
+    	printf("%d\n", dataBlock);
+        
+	if(dataBlock == FAILURE)
+             return FAILURE;
+
+        mounteddisk->fat[dataBlock] = FAT_EOC;
+
+        openfiles[fd].root->firstdatablockindex = dataBlock;
+    }
 
     numBlocks--;
  
@@ -816,15 +836,13 @@ int fs_write(int fd, void *buf, size_t count)
         openfiles[fd].block = dataBlock;
 
         //Write to it
-        block_write(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
-
-	printf("Writing to block %d\n", i);
+        block_write(dataBlock + mounteddisk->superblock->datastartindex, &tempbuf);
     }
 
     free(tempbuf);
 
     //update fileinfo (size and offset) 
-    openfiles[fd].size = openfiles[fd].block_offset + count;
+    openfiles[fd].root->filesize = openfiles[fd].block_offset + count;
     
     //shift block offset here too
     openfiles[fd].total_offset += count;
