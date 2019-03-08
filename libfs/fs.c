@@ -789,22 +789,13 @@ int fs_write(int fd, void *buf, size_t count)
     //read from first block to buffer, then modify point after offset
     block_read(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
     memcpy(&tempbuf[openfiles[fd].block_offset], buf, count);
- 
-    printf("%d\n", dataBlock);
 
-    if(dataBlock != -1)
-    {
-        //write to the first block 
-        block_write(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
-    }
-    //in case file is uninitialized
-    else
+    //if nothing has been written for this file yet
+    if(dataBlock == -1)
     {
         //get new first block, save root stuff
         dataBlock = findFreeFAT();
 
-    	printf("%d\n", dataBlock);
-        
 	if(dataBlock == FAILURE)
              return FAILURE;
 
@@ -812,7 +803,10 @@ int fs_write(int fd, void *buf, size_t count)
 
         openfiles[fd].root->firstdatablockindex = dataBlock;
     }
-
+    
+    //write to the first block 
+    block_write(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
+ 
     numBlocks--;
  
     //write the remaining blocks
@@ -847,7 +841,7 @@ int fs_write(int fd, void *buf, size_t count)
     //shift block offset here too
     openfiles[fd].total_offset += count;
 
-    return SUCCESS;
+    return count;
 }
 
 int fs_read(int fd, void *buf, size_t count)
@@ -890,6 +884,6 @@ int fs_read(int fd, void *buf, size_t count)
     //shift fd offset here too
     openfiles[fd].total_offset += count;
 
-    return SUCCESS;
+    return count;
 }
 
