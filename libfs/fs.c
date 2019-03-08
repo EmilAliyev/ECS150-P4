@@ -352,6 +352,16 @@ static int valid_fd(int fd)
 }
 
 //Check for read errors
+static int write_err_check(int fd)
+{
+    //Case 1: invalid fd
+    if(valid_fd(fd) != SUCCESS)
+        return FAILURE;
+
+    return SUCCESS;
+}
+
+//Check for read errors
 static int read_err_check(int fd)
 {
     //Case 1: invalid fd
@@ -775,7 +785,8 @@ int fs_lseek(int fd, size_t offset)
 
 int fs_write(int fd, void *buf, size_t count)
 {
-    //add checks
+    if(write_err_check(fd) != SUCCESS)
+        return FAILURE;
 
     //Find the starting data block (the data block at the offset)
     int dataBlock = getDataBlock(fd);
