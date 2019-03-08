@@ -757,7 +757,7 @@ int fs_read(int fd, void *buf, size_t count)
         dataBlock = nextBlock(dataBlock);
 
         //Read it
-        block_read(dataBlock + mounteddisk->superblock->datastartindex, tempbuf);
+        block_read(dataBlock + mounteddisk->superblock->datastartindex, &tempbuf[(i + 1) * BLOCK_SIZE]);
     }
 
     //Copy from temporary buffer, starting at the block offset
