@@ -1,6 +1,7 @@
 #ECS 150 Project 4 Report
 
 Emil Aliyev
+
 Noah White
 
 ##Introduction
@@ -66,13 +67,14 @@ We implemented the root directory as a data structure containing 128 of another 
     	Rootentry entries [ROOT_ENTRIES];
 	} __attribute__((packed)) Rootdirectory;
 
+
+
 ##Phase 2
-	
 
 ##Phase 3
 
 ####File Information Structs
-We have a file array, containing all open files. Each open file is represented
+We implemented the file descriptor table as a global array, containing all open files. Each open file is represented
 by a file info struct. Each file info struct contains the following fields:
 
 	open: an integer value that indicates if the file has been closed
@@ -84,3 +86,7 @@ by a file info struct. Each file info struct contains the following fields:
 	first_block: The first block of the current file
 
 ##Phase 4
+
+###File Reading
+
+To read files, we first used helper functions to get the starting block, the number of blocks that must be read, and the offset from the starting block from which to begin reading. Then, starting from the starting block, we read the necessary number of blocks into a dummy buffer using block_read. Then, we simply used memcpy to copy the required bytes of data to the buffer given as an argument from the dummy buffer, starting at the previously determined block offset. This discarded the start of the first block if the starting offset within that block was not zero. 
